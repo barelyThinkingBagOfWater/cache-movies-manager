@@ -1,8 +1,6 @@
 package ch.xavier.movies.domain;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 
 import java.io.Serializable;
@@ -10,7 +8,9 @@ import java.util.Set;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 @ToString
+@EqualsAndHashCode
 public class Movie implements Serializable {
 
     @Id
@@ -18,4 +18,8 @@ public class Movie implements Serializable {
     private String title;
     private String genres;
     private Set<String> tags;
+
+    public void addTag(String tag) {
+        this.getTags().add(tag);
+    }
 }
