@@ -15,7 +15,6 @@ import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Executors;
 
@@ -84,7 +83,7 @@ public class MoviesCacheManager {
 
     private Flux<Boolean> importMoviesFromAllImporters() {
         return Flux.fromIterable(importers)
-                .flatMap(importer -> importMovies(importer.importAll()));
+                .flatMap(moviesImporter -> importMovies(moviesImporter.importAll()));
     }
 
     private Flux<Boolean> importMovies(Flux<Movie> movies) {
@@ -111,10 +110,10 @@ public class MoviesCacheManager {
 
     public Flux<Boolean> addTagsToMovie(Set<String> tags, String movieId) {
         return Flux.fromIterable(tags)
-                .flatMap(tag -> addTagToMovieId(tag, movieId));
+                .flatMap(tag -> addTagToMovie(tag, movieId));
     }
 
-    private Mono<Boolean> addTagToMovieId(String tagName, String movieId) {
+    private Mono<Boolean> addTagToMovie(String tagName, String movieId) {
         return repository.addTagToMovie(tagName, movieId)
                 .timeout(Duration.ofMillis(timeout))
                 .retryBackoff(retryAttempts, Duration.ofMillis(retryDelayInMs))

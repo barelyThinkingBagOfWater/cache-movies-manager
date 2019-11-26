@@ -17,7 +17,6 @@
 		<java.version>13</java.version>
 		<micrometer.version>1.3.0</micrometer.version>
 		<spring-boot.version>2.2.1.RELEASE</spring-boot.version>
-        <opencsv.version>4.1</opencsv.version> <!-->there's a 5.0 out-->
     </properties>
 
 	<dependencies>
@@ -76,11 +75,6 @@
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.opencsv</groupId>
-			<artifactId>opencsv</artifactId>
-			<version>${opencsv.version}</version>
 		</dependency>
 	</dependencies>
 
