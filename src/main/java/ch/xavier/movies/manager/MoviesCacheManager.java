@@ -102,6 +102,13 @@ public class MoviesCacheManager {
         }
     }
 
+    public Flux<Boolean> addTagsToMovies(Set<String> tags, Set<Long> movieIds) {
+        return Flux.fromIterable(movieIds)
+                .map(String::valueOf)
+                .flatMap(movieId -> addTagsToMovie(tags, movieId));
+    }
+
+
     public Flux<Boolean> addTagsToMovie(Set<String> tags, String movieId) {
         return Flux.fromIterable(tags)
                 .flatMap(tag -> addTagToMovieId(tag, movieId));
