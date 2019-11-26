@@ -7,7 +7,11 @@ public interface MoviesRepository {
 
     Mono save(Movie movie);
 
-    Mono<Movie> find(Long movieId);
+    Mono<Movie> find(String movieId);
 
-    Mono<Boolean> addTagToMovie(String tag, Long movieId);
+    Mono<Boolean> addTagToMovie(String tag, String movieId);
+
+    Mono<Long> count();
+
+    Mono<Long> empty();
 }

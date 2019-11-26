@@ -1,21 +1,32 @@
 package ch.xavier.movies.manager;
 
+import ch.xavier.movies.domain.Movie;
 import ch.xavier.movies.importers.MoviesImporter;
+import ch.xavier.movies.manager.repositories.MoviesRepository;
 import ch.xavier.movies.metrics.MetricsManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
+import java.time.Duration;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.Executors;
 
+/**
+ * I'm responsible for too many things, refactor me please
+ */
 @Service
 @Slf4j
 public class MoviesCacheManager {
 
+    private final MoviesRepository repository;
     private final MetricsManager metricsManager;
     private final Scheduler scheduler;
     private final List<MoviesImporter> importers;
@@ -28,6 +39,7 @@ public class MoviesCacheManager {
 
     @Autowired
     public MoviesCacheManager(MetricsManager metricsManager,
+                              MoviesRepository repository,
                               List<MoviesImporter> importers,
                               @Value("${manager.retryDelayInMs}") Long retryDelayInMs,
                               @Value("${manager.retryAttempts}") Integer retryAttempts,
@@ -36,6 +48,7 @@ public class MoviesCacheManager {
                               @Value("${manager.repositoryTimeoutInMs}") Integer timeout) {
         this.metricsManager = metricsManager;
         this.retryDelayInMs = retryDelayInMs;
+        this.repository = repository;
         this.importers = importers;
         this.retryAttempts = retryAttempts;
         this.logEachImport = logEachImport;
@@ -48,26 +61,61 @@ public class MoviesCacheManager {
                     Executors.newFixedThreadPool(numberOfThreads));
         }
 
-//        fillCacheIfEmpty(repository);
+        fillCacheIfEmpty(repository);
     }
 
 
-//    private void fillCacheIfEmpty(TagsRepository repository) {
-//        Long currentCount = repository.count().block();
-//        if (Objects.equals(currentCount, 0L)) {
-//            log.info("Cache is empty, now filling it from every available importers");
-//            importAll().subscribe();
-//        } else {
-//            log.info("Cache started but already filled with {} entries", currentCount);
-//        }
-//    }
+    private void fillCacheIfEmpty(MoviesRepository repository) {
+        repository.count()
+                .doOnNext(count -> {
+                    if (count == 0) {
+                        log.info("Cache is empty, now filling it from every available importers");
+                        importAll().subscribe();
+                    } else {
+                        log.info("The cache just started but is already filled with {} entries", count);
+                    }
+                }).subscribe();
+    }
 
+    public Flux<Boolean> importAll() {
+        return repository.empty()
+                .thenMany(importMoviesFromAllImporters());
+    }
 
+    private Flux<Boolean> importMoviesFromAllImporters() {
+        return Flux.fromIterable(importers)
+                .flatMap(importer -> importMovies(importer.importAll()));
+    }
 
-    private void logImport(String title, String importerClass) {
+    private Flux<Boolean> importMovies(Flux<Movie> movies) {
+        return movies
+                .doOnNext(movie -> logImport(movie.getTitle()))
+                .flatMap(repository::save)
+                .doOnNext(response -> metricsManager.notifyMovieImport())
+                .doOnComplete(() -> log.info("Import successful, the cache is now filled."))
+                .doOnError(e -> log.info("Error caught when importing movies:", e));
+    }
+
+    private void logImport(String title) {
         if (logEachImport) {
-            log.info("Movie:{} imported from importer:{} on Thread:{}",
-                    title, importerClass, Thread.currentThread().getName());
+            log.info("Now importing movie titled:{} on Thread:{}", title, Thread.currentThread().getName());
         }
+    }
+
+    public Flux<Boolean> addTagsToMovie(Set<String> tags, String movieId) {
+        return Flux.fromIterable(tags)
+                .flatMap(tag -> addTagToMovieId(tag, movieId));
+    }
+
+    private Mono<Boolean> addTagToMovieId(String tagName, String movieId) {
+        return repository.addTagToMovie(tagName, movieId)
+                .timeout(Duration.ofMillis(timeout))
+                .retryBackoff(retryAttempts, Duration.ofMillis(retryDelayInMs))
+                .publishOn(scheduler)
+                .doOnError(e -> log.error("error when adding tag:{} to movieId:{}", tagName, movieId, e));
+    }
+
+    public Mono<Movie> find(String movieId) {
+        return repository.find(movieId);
     }
 }

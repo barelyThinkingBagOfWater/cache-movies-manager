@@ -31,6 +31,6 @@ public class RestImporter implements MoviesImporter {
 
     @Override
     public Flux<Movie> importAll() {
-        return null;
+        return getMovies();
     }
 }

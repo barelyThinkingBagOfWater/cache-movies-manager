@@ -1,25 +1,33 @@
 package ch.xavier.movies.domain;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
-import org.springframework.data.annotation.Id;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
-@NoArgsConstructor
+@Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @ToString
 @EqualsAndHashCode
 public class Movie implements Serializable {
 
-    @Id
     private Long movieId;
     private String title;
     private String genres;
     private Set<String> tags;
 
-    public void addTag(String tag) {
-        this.getTags().add(tag);
+    public Movie withNewTag(String tag) {
+        if (getTags().contains(tag)) {
+            return this;
+        } else {
+            HashSet<String> tags = new HashSet<>(getTags());
+            tags.add(tag);
+
+            return new Movie(getMovieId(), getTitle(), getGenres(), tags);
+        }
     }
 }
