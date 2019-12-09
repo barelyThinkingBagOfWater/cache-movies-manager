@@ -8,7 +8,6 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
-import static org.springframework.web.reactive.function.server.RequestPredicates.PUT;
 
 @Configuration
 @Slf4j
@@ -21,6 +20,8 @@ public class RestResource {
         return RouterFunctions
                 .route(GET(URL_PREFIX + "/movie/{movieId}"), handler::getMovie)
                 .andRoute(GET(URL_PREFIX + "/movies/import"), handler::importAllMovies)
-                .andRoute(PUT(URL_PREFIX +"/movie/{movieId}/tag/{tag}"), handler::addTagToMovieId);
+                .andRoute(GET(URL_PREFIX + "/movies"), handler::getMovies)
+//                .andRoute(PUT(URL_PREFIX +"/movie/{movieId}/tag/{tag}"), handler::addTagToMovieId)
+                ;
     }
 }
