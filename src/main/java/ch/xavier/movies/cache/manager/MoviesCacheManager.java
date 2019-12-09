@@ -1,9 +1,9 @@
-package ch.xavier.movies.manager;
+package ch.xavier.movies.cache.manager;
 
-import ch.xavier.movies.domain.Movie;
-import ch.xavier.movies.importers.MoviesImporter;
-import ch.xavier.movies.manager.repositories.MoviesRepository;
-import ch.xavier.movies.metrics.MetricsManager;
+import ch.xavier.movies.cache.domain.Movie;
+import ch.xavier.movies.cache.importers.MoviesImporter;
+import ch.xavier.movies.cache.manager.repositories.MoviesRepository;
+import ch.xavier.movies.cache.metrics.MetricsManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,9 +18,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
 
-/**
- * I'm responsible for too many things, refactor me please
- */
 @Service
 @Slf4j
 public class MoviesCacheManager {
@@ -90,9 +87,12 @@ public class MoviesCacheManager {
         return movies
                 .doOnNext(movie -> logImport(movie.getTitle()))
                 .flatMap(repository::save)
-                .doOnNext(response -> metricsManager.notifyMovieImport())
-                .doOnComplete(() -> log.info("Import successful, the cache is now filled."))
-                .doOnError(e -> log.info("Error caught when importing movies:", e));
+                .doOnNext(response -> metricsManager.notifyMovieImported())
+                .doOnError(e -> {
+                    metricsManager.notifyMovieImportedError();
+                    log.info("Error caught when importing movies:", e);
+                })
+                .doOnComplete(() -> log.info("Import successful, the cache is now filled."));
     }
 
     private void logImport(String title) {
@@ -118,7 +118,11 @@ public class MoviesCacheManager {
                 .timeout(Duration.ofMillis(timeout))
                 .retryBackoff(retryAttempts, Duration.ofMillis(retryDelayInMs))
                 .publishOn(scheduler)
-                .doOnError(e -> log.error("error when adding tag:{} to movieId:{}", tagName, movieId, e));
+                .doOnError(e -> {
+                    metricsManager.notifyTagAddedError();
+                    log.error("error when adding tag:{} to movieId:{}", tagName, movieId, e);
+                })
+                .doOnSuccess(movie -> metricsManager.notifyTagAdded());
     }
 
     public Mono<Movie> find(String movieId) {

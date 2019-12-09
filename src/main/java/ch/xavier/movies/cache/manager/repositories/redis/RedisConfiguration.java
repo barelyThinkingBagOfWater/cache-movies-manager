@@ -1,7 +1,8 @@
-package ch.xavier.movies.manager.repositories.redis;
+package ch.xavier.movies.cache.manager.repositories.redis;
 
-import ch.xavier.movies.domain.Movie;
+import ch.xavier.movies.cache.domain.Movie;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
@@ -14,11 +15,13 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Slf4j
 public class RedisConfiguration {
 
-    private static final int REDIS_DEFAULT_PORT = 6379;
+    @Autowired
+    private ReactiveRedisConnectionFactory factory;
 
     @Bean
-    public ReactiveRedisTemplate<String, Movie> reactiveRedisTemplate(ReactiveRedisConnectionFactory factory) {
-//        return new ReactiveRedisTemplate<String, Movie>(factory, RedisSerializationContext.fromSerializer(new Jackson2JsonRedisSerializer(Movie.class)));
+    public ReactiveRedisTemplate<String, Movie> reactiveRedisTemplate() {
+//        return new ReactiveRedisTemplate<String, Movie>(factory,
+//                RedisSerializationContext.fromSerializer(new Jackson2JsonRedisSerializer(Movie.class)));
 
         StringRedisSerializer keySerializer = new StringRedisSerializer();
         Jackson2JsonRedisSerializer<Movie> valueSerializer = new Jackson2JsonRedisSerializer<>(Movie.class);

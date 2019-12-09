@@ -1,4 +1,4 @@
-package ch.xavier.movies.resources;
+package ch.xavier.movies.cache.resources;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.config.CorsRegistry;

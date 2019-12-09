@@ -1,6 +1,6 @@
-package ch.xavier.movies.importers;
+package ch.xavier.movies.cache.importers;
 
-import ch.xavier.movies.domain.Movie;
+import ch.xavier.movies.cache.domain.Movie;
 import reactor.core.publisher.Flux;
 
 public interface MoviesImporter {

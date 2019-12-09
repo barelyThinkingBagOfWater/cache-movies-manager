@@ -1,4 +1,4 @@
-package ch.xavier.movies;
+package ch.xavier.movies.cache;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,7 +1,7 @@
-package ch.xavier.movies.resources;
+package ch.xavier.movies.cache.resources;
 
-import ch.xavier.movies.domain.Movie;
-import ch.xavier.movies.manager.MoviesCacheManager;
+import ch.xavier.movies.cache.manager.MoviesCacheManager;
+import ch.xavier.movies.cache.domain.Movie;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;

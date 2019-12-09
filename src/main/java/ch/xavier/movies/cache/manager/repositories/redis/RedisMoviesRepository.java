@@ -1,7 +1,7 @@
-package ch.xavier.movies.manager.repositories.redis;
+package ch.xavier.movies.cache.manager.repositories.redis;
 
-import ch.xavier.movies.domain.Movie;
-import ch.xavier.movies.manager.repositories.MoviesRepository;
+import ch.xavier.movies.cache.domain.Movie;
+import ch.xavier.movies.cache.manager.repositories.MoviesRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ReactiveRedisOperations;

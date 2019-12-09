@@ -1,4 +1,4 @@
-package ch.xavier.movies.domain;
+package ch.xavier.movies.cache.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

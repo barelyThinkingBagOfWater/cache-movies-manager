@@ -1,4 +1,4 @@
-package ch.xavier.movies.messages;
+package ch.xavier.movies.cache.messages;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

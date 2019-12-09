@@ -1,6 +1,6 @@
-package ch.xavier.movies.manager.repositories;
+package ch.xavier.movies.cache.manager.repositories;
 
-import ch.xavier.movies.domain.Movie;
+import ch.xavier.movies.cache.domain.Movie;
 import reactor.core.publisher.Mono;
 
 public interface MoviesRepository {

@@ -1,7 +1,7 @@
-package ch.xavier.movies.manager.repositories;
+package ch.xavier.movies.cache.manager.repositories;
 
-import ch.xavier.movies.domain.Movie;
-import ch.xavier.movies.manager.repositories.redis.RedisMoviesRepository;
+import ch.xavier.movies.cache.manager.repositories.redis.RedisMoviesRepository;
+import ch.xavier.movies.cache.domain.Movie;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -22,9 +22,9 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@TestPropertySource(properties = "spring.redis.host=175.17.42.3")
+@TestPropertySource(properties = "spring.redis.host=175.17.42.2")
+@Ignore
 @Slf4j
-
 public class ITestRedisMoviesRepository {
 
     @Autowired

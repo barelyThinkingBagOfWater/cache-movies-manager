@@ -1,7 +1,7 @@
-package ch.xavier.movies.importers.rest;
+package ch.xavier.movies.cache.importers.rest;
 
-import ch.xavier.movies.domain.Movie;
-import ch.xavier.movies.importers.MoviesImporter;
+import ch.xavier.movies.cache.importers.MoviesImporter;
+import ch.xavier.movies.cache.domain.Movie;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

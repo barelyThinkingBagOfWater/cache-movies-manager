@@ -1,6 +1,5 @@
-package ch.xavier.movies.domain;
+package ch.xavier.movies.cache.domain;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 
 import java.io.Serializable;

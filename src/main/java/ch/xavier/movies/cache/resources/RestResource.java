@@ -1,4 +1,4 @@
-package ch.xavier.movies.resources;
+package ch.xavier.movies.cache.resources;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;

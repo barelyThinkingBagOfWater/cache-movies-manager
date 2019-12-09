@@ -1,6 +1,6 @@
-package ch.xavier.movies.messages;
+package ch.xavier.movies.cache.messages;
 
-import ch.xavier.movies.manager.MoviesCacheManager;
+import ch.xavier.movies.cache.manager.MoviesCacheManager;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;

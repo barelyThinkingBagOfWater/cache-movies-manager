@@ -1,4 +1,4 @@
-package ch.xavier.movies.messages;
+package ch.xavier.movies.cache.messages;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
