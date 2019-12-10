@@ -128,4 +128,8 @@ public class MoviesCacheManager {
     public Mono<Movie> find(String movieId) {
         return repository.find(movieId);
     }
+
+    public Mono<List<Movie>> findAll(List<String> movieIds) {
+        return repository.findAll(movieIds);
+    }
 }

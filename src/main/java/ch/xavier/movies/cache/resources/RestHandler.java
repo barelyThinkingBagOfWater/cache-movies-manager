@@ -4,11 +4,12 @@ import ch.xavier.movies.cache.domain.Movie;
 import ch.xavier.movies.cache.manager.MoviesCacheManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -29,26 +30,31 @@ class RestHandler {
     Mono<ServerResponse> getMovie(ServerRequest request) {
         String movieId = request.pathVariable("movieId");
 
-        log.info("getting movieId:{}", movieId);
+        log.info("Getting movie id:{}", movieId);
 
         return ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(moviesCacheManager.find(movieId), Movie.class); //if not found returns null, deal with it properly
+                .body(moviesCacheManager.find(movieId)
+                        .switchIfEmpty(Mono.error(new MovieNotFoundException())),
+                        Movie.class);
     }
 
     Mono<ServerResponse> getMovies(ServerRequest request) {
-        List<String> ids = request.queryParams().get("id");
+        List<String> movieIds = request.queryParams().get("id");
 
-        log.info("getting movieIds:{}", ids);
+        log.info("Getting movies ids:{}", movieIds);
 
         return ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(Flux.fromStream(ids.stream())
-                        .flatMap(moviesCacheManager::find), Movie.class); //if not found returns null, deal with it properly
+                .body(moviesCacheManager.findAll(movieIds)
+                        .switchIfEmpty(Mono.error(new MovieNotFoundException())),
+                        Movie.class);
     }
 
     Mono<ServerResponse> importAllMovies(ServerRequest request) {
         moviesCacheManager.importAll().subscribe();
+
+        log.info("Importing from all importers");
 
         return ok().build();
     }
@@ -63,4 +69,7 @@ class RestHandler {
 //
 //         return ok().build();
 //    }
+
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    private class MovieNotFoundException extends RuntimeException {}
 }
