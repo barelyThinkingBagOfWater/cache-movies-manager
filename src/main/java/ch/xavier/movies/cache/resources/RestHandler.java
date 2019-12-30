@@ -51,10 +51,10 @@ class RestHandler {
                         Movie.class);
     }
 
-    Mono<ServerResponse> importAllMovies(ServerRequest request) {
+    Mono<ServerResponse> refreshCache(ServerRequest request) {
         moviesCacheManager.importAll().subscribe();
 
-        log.info("Importing from all importers");
+        log.info("Refreshing cache from all importers");
 
         return ok().build();
     }
