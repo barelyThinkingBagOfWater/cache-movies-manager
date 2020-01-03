@@ -15,12 +15,15 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
+import static org.springframework.web.reactive.function.server.ServerResponse.status;
 
 @Service
 @Slf4j
 class RestHandler {
 
     private final MoviesCacheManager moviesCacheManager;
+
+    private final static int SERVICE_NOT_AVAILABLE_HTTP_STATUS_CODE = 503;
 
     @Autowired
     public RestHandler(MoviesCacheManager moviesCacheManager) {
@@ -57,6 +60,12 @@ class RestHandler {
         log.info("Refreshing cache from all importers");
 
         return ok().build();
+    }
+
+    Mono<ServerResponse> isCacheReady(ServerRequest serverRequest) {
+        return moviesCacheManager.isCacheReady() ?
+                ok().build() :
+                status(SERVICE_NOT_AVAILABLE_HTTP_STATUS_CODE).build();
     }
 
 //    Mono<ServerResponse> addTagToMovieId(ServerRequest request) {

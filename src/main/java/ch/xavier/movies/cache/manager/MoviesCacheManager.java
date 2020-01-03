@@ -32,6 +32,7 @@ public class MoviesCacheManager {
     private final Integer retryAttempts;
     private final Boolean logEachImport;
     private final Integer timeout;
+    private boolean isCacheReady = false;
 
     @Autowired
     public MoviesCacheManager(MetricsManager metricsManager,
@@ -75,7 +76,8 @@ public class MoviesCacheManager {
 
     public Flux<Boolean> importAll() {
         return repository.empty()
-                .thenMany(importMoviesFromAllImporters());
+                .thenMany(importMoviesFromAllImporters())
+                .doOnComplete(() -> isCacheReady = true);
     }
 
     private Flux<Boolean> importMoviesFromAllImporters() {
@@ -90,7 +92,8 @@ public class MoviesCacheManager {
                 .doOnNext(response -> metricsManager.notifyMovieImported())
                 .doOnError(e -> {
                     metricsManager.notifyMovieImportedError();
-                    log.info("Error caught when importing movies:", e);
+                    log.info("Error caught when importing movies, exiting so that Kubernetes can restart the cache (with its exponential back-off delay):", e);
+                    System.exit(1);
                 })
                 .doOnComplete(() -> log.info("Import successful, the cache is now filled."));
     }
@@ -108,7 +111,7 @@ public class MoviesCacheManager {
     }
 
 
-    public Flux<Boolean> addTagsToMovie(Set<String> tags, String movieId) {
+    private Flux<Boolean> addTagsToMovie(Set<String> tags, String movieId) {
         return Flux.fromIterable(tags)
                 .flatMap(tag -> addTagToMovie(tag, movieId));
     }
@@ -131,5 +134,9 @@ public class MoviesCacheManager {
 
     public Mono<List<Movie>> findAll(List<String> movieIds) {
         return repository.findAll(movieIds);
+    }
+
+    public boolean isCacheReady() {
+        return isCacheReady;
     }
 }
