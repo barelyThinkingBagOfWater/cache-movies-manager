@@ -54,14 +54,13 @@ class CountersFactory {
                 .register(registry);
     }
 
-    //Could cause DOS in Prometheus
-    Counter getMovieSearchedCounter(Long movieId) {
+    Counter getMovieSearchedCounter(String movieId) {
         return Counter
-                .builder("cache-movies-manager.movie." + movieId + ".searched")
-                .description("indicates the number of searches for movieId:" + movieId)
+                .builder("cache-movies-manager.movies.searched")
+                .description("indicates the number of searches of movies")
                 .tag("entity", "movie")
                 .tag("action", "search")
-                .tag("movieId", movieId.toString())
+                .tag("movieId", movieId)
                 .register(registry);
     }
 }

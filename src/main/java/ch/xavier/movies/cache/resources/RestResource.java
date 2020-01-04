@@ -21,8 +21,6 @@ public class RestResource {
                 .route(GET(URL_PREFIX + "/movie/{movieId}"), handler::getMovie)
                 .andRoute(GET(URL_PREFIX + "/movies"), handler::getMovies)
                 .andRoute(GET(URL_PREFIX + "/cache/refresh"), handler::refreshCache)
-                .andRoute(GET("/readiness"), handler::isCacheReady)
-//                .andRoute(PUT(URL_PREFIX +"/movie/{movieId}/tag/{tag}"), handler::addTagToMovieId)
-                ;
+                .andRoute(GET("/readiness"), handler::isCacheReady);
     }
 }

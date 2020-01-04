@@ -70,10 +70,12 @@ public class MoviesCacheManager {
                         importAll().subscribe();
                     } else {
                         log.info("The cache just started but is already filled with {} entries", count);
+                        isCacheReady = true;
                     }
                 }).subscribe();
     }
 
+    //extract this to a dedicated importer class, generic and reusable if possible
     public Flux<Boolean> importAll() {
         return repository.empty()
                 .thenMany(importMoviesFromAllImporters())
@@ -129,10 +131,14 @@ public class MoviesCacheManager {
     }
 
     public Mono<Movie> find(String movieId) {
+        metricsManager.notifyMovieSearch(movieId);
+
         return repository.find(movieId);
     }
 
     public Mono<List<Movie>> findAll(List<String> movieIds) {
+        movieIds.forEach(metricsManager::notifyMovieSearch);
+
         return repository.findAll(movieIds);
     }
 

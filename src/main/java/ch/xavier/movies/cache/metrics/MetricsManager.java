@@ -32,7 +32,7 @@ public class MetricsManager {
         countersFactory.getTagAddedErrorsCounter().increment();
     }
 
-    public void notifyMovieSearch(Long movieId) {
+    public void notifyMovieSearch(String movieId) {
         countersFactory.getMovieSearchedCounter(movieId).increment();
     }
 }

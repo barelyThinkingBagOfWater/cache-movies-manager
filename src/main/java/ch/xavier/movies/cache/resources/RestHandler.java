@@ -68,16 +68,6 @@ class RestHandler {
                 status(SERVICE_NOT_AVAILABLE_HTTP_STATUS_CODE).build();
     }
 
-//    Mono<ServerResponse> addTagToMovieId(ServerRequest request) {
-//        String tag = request.pathVariable("tag");
-//        String movieId = request.pathVariable("movieId");
-//
-//        log.info("Adding tag:{} to movieId:{}", tag, movieId);
-//
-//        moviesCacheManager.addTagsToMovie(Set.of(tag), movieId).subscribe();
-//
-//         return ok().build();
-//    }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
     private class MovieNotFoundException extends RuntimeException {}
