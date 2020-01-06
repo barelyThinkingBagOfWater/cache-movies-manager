@@ -16,7 +16,6 @@ import reactor.core.scheduler.Schedulers;
 import java.time.Duration;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Executors;
 
 @Service
 @Slf4j
@@ -24,7 +23,7 @@ public class MoviesCacheManager {
 
     private final MoviesRepository repository;
     private final MetricsManager metricsManager;
-    private final Scheduler scheduler;
+    private final Scheduler scheduler = Schedulers.parallel();
     private final List<MoviesImporter> importers;
 
 
@@ -41,7 +40,6 @@ public class MoviesCacheManager {
                               @Value("${manager.retryDelayInMs}") Long retryDelayInMs,
                               @Value("${manager.retryAttempts}") Integer retryAttempts,
                               @Value("${manager.logEachImport}") Boolean logEachImport,
-                              @Value("${manager.numberOfThreads:0}") Integer numberOfThreads,
                               @Value("${manager.repositoryTimeoutInMs}") Integer timeout) {
         this.metricsManager = metricsManager;
         this.retryDelayInMs = retryDelayInMs;
@@ -50,13 +48,6 @@ public class MoviesCacheManager {
         this.retryAttempts = retryAttempts;
         this.logEachImport = logEachImport;
         this.timeout = timeout;
-
-        if (numberOfThreads < 1) {
-            this.scheduler = Schedulers.parallel();
-        } else {
-            this.scheduler = Schedulers.fromExecutor(
-                    Executors.newFixedThreadPool(numberOfThreads));
-        }
 
         fillCacheIfEmpty(repository);
     }
@@ -75,7 +66,6 @@ public class MoviesCacheManager {
                 }).subscribe();
     }
 
-    //extract this to a dedicated importer class, generic and reusable if possible
     public Flux<Boolean> importAll() {
         return repository.empty()
                 .thenMany(importMoviesFromAllImporters())
@@ -90,6 +80,7 @@ public class MoviesCacheManager {
     private Flux<Boolean> importMovies(Flux<Movie> movies) {
         return movies
                 .doOnNext(movie -> logImport(movie.getTitle()))
+                .publishOn(scheduler)
                 .flatMap(repository::save)
                 .doOnNext(response -> metricsManager.notifyMovieImported())
                 .doOnError(e -> {
