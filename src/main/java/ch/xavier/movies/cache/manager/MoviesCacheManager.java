@@ -16,6 +16,7 @@ import reactor.core.scheduler.Schedulers;
 import java.time.Duration;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executors;
 
 @Service
 @Slf4j
@@ -23,7 +24,7 @@ public class MoviesCacheManager {
 
     private final MoviesRepository repository;
     private final MetricsManager metricsManager;
-    private final Scheduler scheduler = Schedulers.parallel();
+    private final Scheduler scheduler;
     private final List<MoviesImporter> importers;
 
 
@@ -48,6 +49,9 @@ public class MoviesCacheManager {
         this.retryAttempts = retryAttempts;
         this.logEachImport = logEachImport;
         this.timeout = timeout;
+
+        this.scheduler = Schedulers.fromExecutor(Executors.newFixedThreadPool(
+                Runtime.getRuntime().availableProcessors()));
 
         fillCacheIfEmpty(repository);
     }
