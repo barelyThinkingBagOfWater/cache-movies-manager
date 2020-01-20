@@ -13,8 +13,8 @@ import java.util.UUID;
 @Configuration
 public class RabbitConfig {
 
-    //Adding the hostname is also too random. Use a kind of instanceId passed from a higher level (configMap?) that you can also add to the MDC and in other places (metrics config?)
-    private static final String QUEUE_NAME = "tags.added.queue.cache-tags-manager." + UUID.randomUUID();
+    //Adding the hostname is also too random. Use a kind of instanceId/correlationId passed from a higher level (configMap?) that you can also add to the MDC and in other places (metrics config?)
+    private static final String QUEUE_NAME = "tags.added.queue.cache-movies-manager." + UUID.randomUUID();
 
     @Bean
     Queue tagsAddedQueue() throws IOException {
