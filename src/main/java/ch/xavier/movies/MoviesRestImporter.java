@@ -1,7 +1,6 @@
-package ch.xavier.movies.cache.importers.rest;
+package ch.xavier.movies;
 
-import ch.xavier.movies.cache.importers.MoviesImporter;
-import ch.xavier.movies.cache.domain.Movie;
+import ch.xavier.Importer;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
@@ -20,12 +19,12 @@ import javax.net.ssl.SSLException;
 @Slf4j
 @Service
 @ConditionalOnProperty("importer.rest.uri")
-public class RestImporter implements MoviesImporter {
+public class MoviesRestImporter implements Importer<Movie> {
 
     private final WebClient client;
 
     @Autowired
-    public RestImporter(@Value("${importer.rest.uri}") String uri) throws SSLException {
+    public MoviesRestImporter(@Value("${importer.rest.uri}") String uri) throws SSLException {
         SslContext sslContext = SslContextBuilder
                 .forClient()
                 .trustManager(InsecureTrustManagerFactory.INSTANCE) //not for prod...

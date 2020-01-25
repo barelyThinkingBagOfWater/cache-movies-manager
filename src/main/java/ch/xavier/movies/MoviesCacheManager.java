@@ -1,9 +1,7 @@
-package ch.xavier.movies.cache.manager;
+package ch.xavier.movies;
 
-import ch.xavier.movies.cache.domain.Movie;
-import ch.xavier.movies.cache.importers.MoviesImporter;
-import ch.xavier.movies.cache.manager.repositories.MoviesRepository;
-import ch.xavier.movies.cache.metrics.MetricsManager;
+import ch.xavier.Importer;
+import ch.xavier.metrics.MetricsManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +23,7 @@ public class MoviesCacheManager {
     private final MoviesRepository repository;
     private final MetricsManager metricsManager;
     private final Scheduler scheduler;
-    private final List<MoviesImporter> importers;
+    private final List<Importer<Movie>> importers;
 
 
     private final Long retryDelayInMs;
@@ -37,7 +35,7 @@ public class MoviesCacheManager {
     @Autowired
     public MoviesCacheManager(MetricsManager metricsManager,
                               MoviesRepository repository,
-                              List<MoviesImporter> importers,
+                              List<Importer<Movie>> importers,
                               @Value("${manager.retryDelayInMs}") Long retryDelayInMs,
                               @Value("${manager.retryAttempts}") Integer retryAttempts,
                               @Value("${manager.logEachImport}") Boolean logEachImport,
@@ -53,11 +51,11 @@ public class MoviesCacheManager {
         this.scheduler = Schedulers.fromExecutor(Executors.newFixedThreadPool(
                 Runtime.getRuntime().availableProcessors()));
 
-        fillCacheIfEmpty(repository);
+        fillCacheIfEmpty();
     }
 
 
-    private void fillCacheIfEmpty(MoviesRepository repository) {
+    private void fillCacheIfEmpty() {
         repository.count()
                 .doOnNext(count -> {
                     if (count == 0) {
@@ -70,7 +68,7 @@ public class MoviesCacheManager {
                 }).subscribe();
     }
 
-    public Flux<Boolean> importAll() {
+    Flux<Boolean> importAll() {
         return repository.empty()
                 .thenMany(importMoviesFromAllImporters())
                 .doOnComplete(() -> isCacheReady = true);
@@ -89,7 +87,7 @@ public class MoviesCacheManager {
                 .doOnNext(response -> metricsManager.notifyMovieImported())
                 .doOnError(e -> {
                     metricsManager.notifyMovieImportedError();
-                    log.info("Error caught when importing movies, exiting so that Kubernetes can restart the cache (with its exponential back-off delay):", e);
+                    log.error("Error caught when importing movies, exiting so that Kubernetes can restart the cache (with its exponential back-off delay):", e);
                     System.exit(1);
                 })
                 .doOnComplete(() -> log.info("Import successful, the cache is now filled."));
@@ -125,19 +123,19 @@ public class MoviesCacheManager {
                 .doOnSuccess(movie -> metricsManager.notifyTagAdded());
     }
 
-    public Mono<Movie> find(String movieId) {
+    Mono<Movie> find(String movieId) {
         metricsManager.notifyMovieSearch(movieId);
 
         return repository.find(movieId);
     }
 
-    public Mono<List<Movie>> findAll(List<String> movieIds) {
+    Mono<List<Movie>> findAll(List<String> movieIds) {
         movieIds.forEach(metricsManager::notifyMovieSearch);
 
         return repository.findAll(movieIds);
     }
 
-    public boolean isCacheReady() {
+    boolean isCacheReady() {
         return isCacheReady;
     }
 }

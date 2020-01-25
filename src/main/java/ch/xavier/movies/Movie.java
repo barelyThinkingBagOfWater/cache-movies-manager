@@ -1,4 +1,4 @@
-package ch.xavier.movies.cache.domain;
+package ch.xavier.movies;
 
 import lombok.*;
 

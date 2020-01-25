@@ -1,13 +1,12 @@
-package ch.xavier.movies.cache.manager.repositories;
+package ch.xavier.movies;
 
-import ch.xavier.movies.cache.domain.Movie;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 
 public interface MoviesRepository {
 
-    Mono save(Movie movie);
+    Mono<Boolean> save(Movie movie);
 
     Mono<Movie> find(String movieId);
 

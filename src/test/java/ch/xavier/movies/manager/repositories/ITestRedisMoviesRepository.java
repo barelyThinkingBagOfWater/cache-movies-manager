@@ -1,7 +1,7 @@
-package ch.xavier.movies.cache.manager.repositories;
+package ch.xavier.movies.manager.repositories;
 
-import ch.xavier.movies.cache.manager.repositories.redis.RedisMoviesRepository;
-import ch.xavier.movies.cache.domain.Movie;
+import ch.xavier.movies.Movie;
+import ch.xavier.movies.repositories.RedisMoviesRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Ignore;

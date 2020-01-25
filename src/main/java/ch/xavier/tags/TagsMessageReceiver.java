@@ -1,6 +1,7 @@
-package ch.xavier.movies.cache.messages;
+package ch.xavier.tags;
 
-import ch.xavier.movies.cache.manager.MoviesCacheManager;
+import ch.xavier.movies.MoviesCacheManager;
+import ch.xavier.tags.messages.AddTagsMessage;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class Receiver {
+public class TagsMessageReceiver {
 
     @Autowired
     private MoviesCacheManager manager;

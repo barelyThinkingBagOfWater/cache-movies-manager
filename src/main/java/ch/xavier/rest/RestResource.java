@@ -1,5 +1,6 @@
-package ch.xavier.movies.cache.resources;
+package ch.xavier.rest;
 
+import ch.xavier.movies.MoviesRestHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +17,7 @@ public class RestResource {
     private static final String URL_PREFIX = "/cache-movies-manager";
 
     @Bean
-    public RouterFunction<ServerResponse> route(RestHandler handler) {
+    public RouterFunction<ServerResponse> route(MoviesRestHandler handler) {
         return RouterFunctions
                 .route(GET(URL_PREFIX + "/movie/{movieId}"), handler::getMovie)
                 .andRoute(GET(URL_PREFIX + "/movies"), handler::getMovies)

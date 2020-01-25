@@ -1,4 +1,4 @@
-package ch.xavier.movies.cache.metrics;
+package ch.xavier.metrics;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.boot.actuate.autoconfigure.metrics.MeterRegistryCustomizer;

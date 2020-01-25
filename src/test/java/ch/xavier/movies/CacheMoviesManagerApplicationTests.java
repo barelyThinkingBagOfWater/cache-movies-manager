@@ -1,7 +1,6 @@
-package ch.xavier.movies.cache;
+package ch.xavier.movies;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
 //@SpringBootTest
 class CacheMoviesManagerApplicationTests {
