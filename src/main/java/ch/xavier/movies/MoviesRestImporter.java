@@ -4,7 +4,6 @@ import ch.xavier.Importer;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -16,7 +15,6 @@ import reactor.netty.http.client.HttpClient;
 
 import javax.net.ssl.SSLException;
 
-@Slf4j
 @Service
 @ConditionalOnProperty("importer.rest.uri")
 public class MoviesRestImporter implements Importer<Movie> {

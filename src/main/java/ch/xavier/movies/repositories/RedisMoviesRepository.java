@@ -13,6 +13,9 @@ import java.util.List;
 
 @Repository
 @Slf4j
+/*
+  If you want Redis-based transaction support use Redisson instead of Spring data
+ */
 public class RedisMoviesRepository implements MoviesRepository {
 
     private final ReactiveRedisOperations<String, Movie> reactiveRedisOperations;

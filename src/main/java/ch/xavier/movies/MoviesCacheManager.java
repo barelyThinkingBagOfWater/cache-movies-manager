@@ -25,7 +25,6 @@ public class MoviesCacheManager {
     private final Scheduler scheduler;
     private final List<Importer<Movie>> importers;
 
-
     private final Long retryDelayInMs;
     private final Integer retryAttempts;
     private final Boolean logEachImport;
@@ -113,9 +112,9 @@ public class MoviesCacheManager {
 
     private Mono<Boolean> addTagToMovie(String tagName, String movieId) {
         return repository.addTagToMovie(tagName, movieId)
+                .publishOn(scheduler)
                 .timeout(Duration.ofMillis(timeout))
                 .retryBackoff(retryAttempts, Duration.ofMillis(retryDelayInMs))
-                .publishOn(scheduler)
                 .doOnError(e -> {
                     metricsManager.notifyTagAddedError();
                     log.error("error when adding tag:{} to movieId:{}", tagName, movieId, e);
