@@ -1,7 +1,7 @@
 package ch.xavier.tags;
 
+import ch.xavier.common.tags.messages.TagsAddedMessage;
 import ch.xavier.movies.MoviesCacheManager;
-import ch.xavier.tags.messages.AddTagsMessage;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -9,6 +9,9 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 @Component
 @Slf4j
@@ -24,10 +27,11 @@ public class TagsMessageReceiver {
 
         MDC.put("correlationId", message.getMessageProperties().getCorrelationId());
 
-        AddTagsMessage addTagsMessage = gson.fromJson(new String(message.getBody()), AddTagsMessage.class);
+        TagsAddedMessage tagsAddedMessage = gson.fromJson(new String(message.getBody(), StandardCharsets.UTF_8),
+                TagsAddedMessage.class);
 
-        log.info("Received message to add tags:{} to movieIds:{}", addTagsMessage.getTags(), addTagsMessage.getMovieIds());
-        manager.addTagsToMovies(addTagsMessage.getTags(), addTagsMessage.getMovieIds()).subscribe();
+        log.info("Received message to add tags:{} to movieIds:{}", tagsAddedMessage.getTags(), tagsAddedMessage.getMovieIds());
+        manager.addTagsToMovies(tagsAddedMessage.getTags(), tagsAddedMessage.getMovieIds()).subscribe();
 
         MDC.remove("correlationId");
     }

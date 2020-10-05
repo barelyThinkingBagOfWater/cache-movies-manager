@@ -1,5 +1,6 @@
 package ch.xavier.movies;
 
+import ch.xavier.common.movies.Movie;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -69,6 +70,6 @@ class MoviesRestHandler {
 
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    private class MovieNotFoundException extends RuntimeException {
+    private static class MovieNotFoundException extends RuntimeException {
     }
 }

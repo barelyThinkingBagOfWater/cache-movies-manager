@@ -1,15 +1,19 @@
 package ch.xavier.movies;
 
-import ch.xavier.Importer;
-import ch.xavier.metrics.MetricsManager;
+import ch.xavier.common.EntitiesImporter;
+import ch.xavier.common.metrics.MetricsService;
+import ch.xavier.common.movies.Movie;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
+import reactor.util.retry.Retry;
 
 import java.time.Duration;
 import java.util.List;
@@ -21,9 +25,9 @@ import java.util.concurrent.Executors;
 public class MoviesCacheManager {
 
     private final MoviesRepository repository;
-    private final MetricsManager metricsManager;
+    private final MetricsService metricsService;
     private final Scheduler scheduler;
-    private final List<Importer<Movie>> importers;
+    private final List<EntitiesImporter<Movie>> importers;
 
     private final Long retryDelayInMs;
     private final Integer retryAttempts;
@@ -31,15 +35,17 @@ public class MoviesCacheManager {
     private final Integer timeout;
     private boolean isCacheReady = false;
 
+    private ApplicationContext applicationContext;
+
     @Autowired
-    public MoviesCacheManager(MetricsManager metricsManager,
+    public MoviesCacheManager(MetricsService metricsService,
                               MoviesRepository repository,
-                              List<Importer<Movie>> importers,
+                              List<EntitiesImporter<Movie>> importers,
                               @Value("${manager.retryDelayInMs}") Long retryDelayInMs,
                               @Value("${manager.retryAttempts}") Integer retryAttempts,
                               @Value("${manager.logEachImport}") Boolean logEachImport,
                               @Value("${manager.repositoryTimeoutInMs}") Integer timeout) {
-        this.metricsManager = metricsManager;
+        this.metricsService = metricsService;
         this.retryDelayInMs = retryDelayInMs;
         this.repository = repository;
         this.importers = importers;
@@ -83,11 +89,11 @@ public class MoviesCacheManager {
                 .doOnNext(movie -> logImport(movie.getTitle()))
                 .publishOn(scheduler)
                 .flatMap(repository::save)
-                .doOnNext(response -> metricsManager.notifyMovieImported())
+                .doOnNext(response -> metricsService.notifyMovieImported())
                 .doOnError(e -> {
-                    metricsManager.notifyMovieImportedError();
+                    metricsService.notifyMovieImportedError();
                     log.error("Error caught when importing movies, exiting so that Kubernetes can restart the cache (with its exponential back-off delay):", e);
-                    System.exit(1);
+                    ((ConfigurableApplicationContext) applicationContext).close();
                 })
                 .doOnComplete(() -> log.info("Import successful, the cache is now filled."));
     }
@@ -112,24 +118,24 @@ public class MoviesCacheManager {
 
     private Mono<Boolean> addTagToMovie(String tagName, String movieId) {
         return repository.addTagToMovie(tagName, movieId)
-                .publishOn(scheduler)
                 .timeout(Duration.ofMillis(timeout))
-                .retryBackoff(retryAttempts, Duration.ofMillis(retryDelayInMs))
+                .retryWhen(Retry.backoff(retryAttempts, Duration.ofMillis(retryDelayInMs)))
+                .subscribeOn(scheduler)
                 .doOnError(e -> {
-                    metricsManager.notifyTagAddedError();
+                    metricsService.notifyTagAddedError();
                     log.error("error when adding tag:{} to movieId:{}", tagName, movieId, e);
                 })
-                .doOnSuccess(movie -> metricsManager.notifyTagAdded());
+                .doOnSuccess(movie -> metricsService.notifyTagAdded());
     }
 
     Mono<Movie> find(String movieId) {
-        metricsManager.notifyMovieSearch(movieId);
+        metricsService.notifyMovieSearched();
 
         return repository.find(movieId);
     }
 
     Mono<List<Movie>> findAll(List<String> movieIds) {
-        movieIds.forEach(metricsManager::notifyMovieSearch);
+        movieIds.forEach(movieId -> metricsService.notifyMovieSearched());
 
         return repository.findAll(movieIds);
     }

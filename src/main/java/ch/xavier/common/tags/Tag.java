@@ -1,19 +1,17 @@
-package ch.xavier.tags;
+package ch.xavier.common.tags;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.ToString;
 
 import java.util.Collections;
 import java.util.Set;
 
 @Getter
 @AllArgsConstructor
-@ToString
 public class Tag {
 
-    private String tagName;
-    private Set<Long> movieIds;
+    private final String tagName;
+    private final Set<Long> movieIds;
 
     public Tag(String tagName) {
         this.tagName = tagName;

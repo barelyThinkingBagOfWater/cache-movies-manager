@@ -1,6 +1,6 @@
 package ch.xavier.movies.repositories;
 
-import ch.xavier.movies.Movie;
+import ch.xavier.common.movies.Movie;
 import ch.xavier.movies.MoviesRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,11 +11,11 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-@Repository
-@Slf4j
 /*
   If you want Redis-based transaction support use Redisson instead of Spring data
  */
+@Repository
+@Slf4j
 public class RedisMoviesRepository implements MoviesRepository {
 
     private final ReactiveRedisOperations<String, Movie> reactiveRedisOperations;
@@ -45,7 +45,7 @@ public class RedisMoviesRepository implements MoviesRepository {
     @Override
     public Mono<Boolean> addTagToMovie(String tag, String movieId) {
         return find(movieId)
-                .switchIfEmpty(Mono.error(new Exception()))
+                .switchIfEmpty(Mono.error(new Exception())) //mmhhhh....
                 .flatMap(movie -> save(movie.withNewTag(tag)));
     }
 

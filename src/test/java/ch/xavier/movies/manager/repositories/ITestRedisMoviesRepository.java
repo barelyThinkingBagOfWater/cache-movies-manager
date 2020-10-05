@@ -1,10 +1,9 @@
 package ch.xavier.movies.manager.repositories;
 
-import ch.xavier.movies.Movie;
+import ch.xavier.common.movies.Movie;
 import ch.xavier.movies.repositories.RedisMoviesRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
@@ -17,13 +16,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@TestPropertySource(properties = "spring.redis.host=175.17.42.2")
-@Ignore
+@TestPropertySource(properties = {
+        "spring.redis.host=172.18.42.5",
+        "spring.rabbitmq.host=172.18.42.3"})
 @Slf4j
 public class ITestRedisMoviesRepository {
 
@@ -47,7 +46,7 @@ public class ITestRedisMoviesRepository {
 
                 // THEN
                 .doOnNext(Assertions::assertNotNull)
-                .doOnNext(movie -> assertThat(movie.getTitle(), is("title")))
+                .doOnNext(movie -> assertEquals(movie.getTitle(), "title"))
                 .block();
     }
 
@@ -66,9 +65,9 @@ public class ITestRedisMoviesRepository {
 
                 // THEN1
                 .doOnNext(Assertions::assertNotNull)
-                .doOnNext(movie -> assertThat(movie.getTitle(), is("title")))
-                .doOnNext(movie -> assertThat(movie.getGenres(), is("genres")))
-                .doOnNext(movie -> assertThat(movie.getTags(), is(Collections.emptySet())))
+                .doOnNext(movie -> assertEquals(movie.getTitle(), "title"))
+                .doOnNext(movie -> assertEquals(movie.getGenres(), "genres"))
+                .doOnNext(movie -> assertEquals(movie.getTags(), Collections.emptySet()))
 
                 // WHEN2
                 .then(redisMoviesRepository.addTagToMovie(newTag, movieId))
@@ -77,9 +76,9 @@ public class ITestRedisMoviesRepository {
 
                 // THEN2
                 .doOnNext(Assertions::assertNotNull)
-                .doOnNext(movie -> assertThat(movie.getTitle(), is("title")))
-                .doOnNext(movie -> assertThat(movie.getGenres(), is("genres")))
-                .doOnNext(movie -> assertThat(movie.getTags(), is(Set.of(newTag))))
+                .doOnNext(movie -> assertEquals(movie.getTitle(), "title"))
+                .doOnNext(movie -> assertEquals(movie.getGenres(), "genres"))
+                .doOnNext(movie -> assertEquals(movie.getTags(), Set.of(newTag)))
                 .block();
     }
 
@@ -97,9 +96,9 @@ public class ITestRedisMoviesRepository {
 
                 // THEN1
                 .doOnNext(Assertions::assertNotNull)
-                .doOnNext(movie -> assertThat(movie.getTitle(), is("title")))
-                .doOnNext(movie -> assertThat(movie.getGenres(), is("genres")))
-                .doOnNext(movie -> assertThat(movie.getTags(), is(Collections.emptySet())))
+                .doOnNext(movie -> assertEquals(movie.getTitle(), "title"))
+                .doOnNext(movie -> assertEquals(movie.getGenres(), "genres"))
+                .doOnNext(movie -> assertEquals(movie.getTags(), Collections.emptySet()))
 
                 // WHEN2
                 .thenMany(redisMoviesRepository.empty())

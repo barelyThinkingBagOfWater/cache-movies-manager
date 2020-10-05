@@ -14,14 +14,12 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 @Slf4j
 public class RestResource {
 
-    private static final String URL_PREFIX = "/cache-movies-manager";
-
     @Bean
     public RouterFunction<ServerResponse> route(MoviesRestHandler handler) {
         return RouterFunctions
-                .route(GET(URL_PREFIX + "/movie/{movieId}"), handler::getMovie)
-                .andRoute(GET(URL_PREFIX + "/movies"), handler::getMovies)
-                .andRoute(GET(URL_PREFIX + "/cache/refresh"), handler::refreshCache)
+                .route(GET("/movie/{movieId}"), handler::getMovie)
+                .andRoute(GET("/movies"), handler::getMovies)
+                .andRoute(GET("/cache/refresh"), handler::refreshCache)
                 .andRoute(GET("/readiness"), handler::isCacheReady);
     }
 }

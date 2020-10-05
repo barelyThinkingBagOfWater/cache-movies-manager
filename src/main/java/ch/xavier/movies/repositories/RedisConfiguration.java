@@ -1,7 +1,6 @@
-package ch.xavier;
+package ch.xavier.movies.repositories;
 
-import ch.xavier.movies.Movie;
-import lombok.extern.slf4j.Slf4j;
+import ch.xavier.common.movies.Movie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +11,6 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
-@Slf4j
 public class RedisConfiguration {
 
     @Autowired
@@ -20,15 +18,13 @@ public class RedisConfiguration {
 
     @Bean
     public ReactiveRedisTemplate<String, Movie> reactiveRedisTemplate() {
-
         StringRedisSerializer keySerializer = new StringRedisSerializer();
         Jackson2JsonRedisSerializer<Movie> valueSerializer = new Jackson2JsonRedisSerializer<>(Movie.class);
 
         RedisSerializationContext.RedisSerializationContextBuilder<String, Movie> builder =
                 RedisSerializationContext.newSerializationContext(keySerializer);
 
-        RedisSerializationContext<String, Movie> context =
-                builder.value(valueSerializer).build();
+        RedisSerializationContext<String, Movie> context = builder.value(valueSerializer).build();
 
         return new ReactiveRedisTemplate<>(factory, context);
     }

@@ -1,19 +1,21 @@
-package ch.xavier.movies;
+package ch.xavier.common.movies;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.springframework.data.annotation.Id;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
-@EqualsAndHashCode
-public class Movie implements Serializable {
+@Getter
+@ToString //for logging during imports
+public class Movie {
 
+    @Id
     private Long movieId;
     private String title;
     private String genres;

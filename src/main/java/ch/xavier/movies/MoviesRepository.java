@@ -1,5 +1,6 @@
 package ch.xavier.movies;
 
+import ch.xavier.common.movies.Movie;
 import reactor.core.publisher.Mono;
 
 import java.util.List;

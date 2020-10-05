@@ -1,6 +1,7 @@
 package ch.xavier.movies;
 
-import ch.xavier.Importer;
+import ch.xavier.common.EntitiesImporter;
+import ch.xavier.common.movies.Movie;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
@@ -17,7 +18,7 @@ import javax.net.ssl.SSLException;
 
 @Service
 @ConditionalOnProperty("importer.rest.uri")
-public class MoviesRestImporter implements Importer<Movie> {
+public class MoviesRestImporter implements EntitiesImporter<Movie> {
 
     private final WebClient client;
 
@@ -40,7 +41,7 @@ public class MoviesRestImporter implements Importer<Movie> {
 
 
     private Flux<Movie> getMovies() {
-        return client.get().uri("/movies-manager/movies")
+        return client.get().uri("/movies")
                 .retrieve()
                 .bodyToFlux(Movie.class);
     }
