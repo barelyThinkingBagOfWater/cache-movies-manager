@@ -125,7 +125,7 @@ public class MoviesCacheManager implements ApplicationContextAware {
                 .subscribeOn(scheduler)
                 .doOnError(e -> {
                     metricsService.notifyTagAddedError();
-                    log.error("error when adding tag:{} to movieId:{}", tagName, movieId, e);
+                    log.error("The movie id:{} is missing, cannot add tag:{}", movieId, tagName, e);
                 })
                 .doOnSuccess(movie -> metricsService.notifyTagAdded());
     }

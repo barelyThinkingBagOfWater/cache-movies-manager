@@ -17,7 +17,7 @@ import java.util.List;
 public class RedisMoviesRepository implements MoviesRepository {
 
     private final ReactiveRedisOperations<String, Movie> reactiveRedisOperations;
-    private ReactiveValueOperations<String, Movie> reactiveValueOps;
+    private final ReactiveValueOperations<String, Movie> reactiveValueOps;
 
     @Autowired
     public RedisMoviesRepository(ReactiveRedisOperations<String, Movie> reactiveRedisOperations) {
@@ -43,7 +43,7 @@ public class RedisMoviesRepository implements MoviesRepository {
     @Override
     public Mono<Boolean> addTagToMovie(String tag, String movieId) {
         return find(movieId)
-                .switchIfEmpty(Mono.error(new Exception())) //mmhhhh....
+                .switchIfEmpty(Mono.error(new MissingMovieException()))
                 .flatMap(movie -> save(movie.withNewTag(tag)));
     }
 
@@ -56,4 +56,6 @@ public class RedisMoviesRepository implements MoviesRepository {
     public Mono<Long> empty() {
         return reactiveRedisOperations.delete(reactiveRedisOperations.scan());
     }
+
+    private class MissingMovieException extends RuntimeException { }
 }

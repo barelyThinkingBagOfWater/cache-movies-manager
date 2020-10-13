@@ -29,6 +29,7 @@ public class RedisConfiguration {
 
     private static final int DEFAULT_PORT =  6379;
 
+
     @Bean
     public ReactiveRedisConnectionFactory factory() {
         if (clusterHosts.get(0).isEmpty()) {
