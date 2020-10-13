@@ -4,9 +4,11 @@ import ch.xavier.common.EntitiesImporter;
 import ch.xavier.common.metrics.MetricsService;
 import ch.xavier.common.movies.Movie;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -22,7 +24,7 @@ import java.util.concurrent.Executors;
 
 @Service
 @Slf4j
-public class MoviesCacheManager {
+public class MoviesCacheManager implements ApplicationContextAware {
 
     private final MoviesRepository repository;
     private final MetricsService metricsService;
@@ -142,5 +144,10 @@ public class MoviesCacheManager {
 
     boolean isCacheReady() {
         return isCacheReady;
+    }
+
+    @Override //hack as system.exit(1) doesn't work
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 }

@@ -11,9 +11,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-/*
-  If you want Redis-based transaction support use Redisson instead of Spring data
- */
+
 @Repository
 @Slf4j
 public class RedisMoviesRepository implements MoviesRepository {
@@ -29,7 +27,7 @@ public class RedisMoviesRepository implements MoviesRepository {
 
     @Override
     public Mono<Boolean> save(Movie movie) {
-        return reactiveValueOps.set(movie.getMovieId().toString(), movie);
+        return reactiveValueOps.setIfAbsent(movie.getMovieId().toString(), movie);
     }
 
     @Override
