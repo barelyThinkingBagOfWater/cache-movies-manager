@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 
 @Component
 @Slf4j
-public class TagsMessageReceiver{
+public class TagsMessageReceiver {
 
     @Autowired
     private MoviesCacheManager manager;
