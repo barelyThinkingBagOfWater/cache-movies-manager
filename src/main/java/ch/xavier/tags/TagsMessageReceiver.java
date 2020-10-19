@@ -10,12 +10,11 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 @Component
 @Slf4j
-public class TagsMessageReceiver {
+public class TagsMessageReceiver{
 
     @Autowired
     private MoviesCacheManager manager;
@@ -24,7 +23,6 @@ public class TagsMessageReceiver {
 
     @RabbitListener(queues = "#{rabbitConfig.getQueueName()}")
     public void receiveMessage(Message message) {
-
         MDC.put("correlationId", message.getMessageProperties().getCorrelationId());
 
         TagsAddedMessage tagsAddedMessage = gson.fromJson(new String(message.getBody(), StandardCharsets.UTF_8),

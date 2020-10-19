@@ -7,7 +7,6 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.io.IOException;
 import java.util.UUID;
 
 @Configuration
@@ -17,7 +16,7 @@ public class RabbitConfig {
     private static final String QUEUE_NAME = "tags.added.queue.cache-movies-manager." + UUID.randomUUID();
 
     @Bean
-    Queue tagsAddedQueue() throws IOException {
+    Queue tagsAddedQueue() {
         return new Queue(QUEUE_NAME, false);
     }
 
@@ -27,7 +26,7 @@ public class RabbitConfig {
     }
 
     @Bean
-    Binding tagsAddedBinding() throws IOException {
+    Binding tagsAddedBinding() {
         return BindingBuilder.bind(tagsAddedQueue()).to(tagsAddedExchange());
     }
 

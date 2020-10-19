@@ -4,12 +4,8 @@ import ch.xavier.common.EntitiesImporter;
 import ch.xavier.common.metrics.MetricsService;
 import ch.xavier.common.movies.Movie;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -24,7 +20,7 @@ import java.util.concurrent.Executors;
 
 @Service
 @Slf4j
-public class MoviesCacheManager implements ApplicationContextAware {
+public class MoviesCacheManager {
 
     private final MoviesRepository repository;
     private final MetricsService metricsService;
@@ -37,7 +33,6 @@ public class MoviesCacheManager implements ApplicationContextAware {
     private final Integer timeout;
     private boolean isCacheReady = false;
 
-    private ApplicationContext applicationContext;
 
     @Autowired
     public MoviesCacheManager(MetricsService metricsService,
@@ -95,7 +90,7 @@ public class MoviesCacheManager implements ApplicationContextAware {
                 .doOnError(e -> {
                     metricsService.notifyMovieImportedError();
                     log.error("Error caught when importing movies, exiting so that Kubernetes can restart the cache (with its exponential back-off delay):", e);
-                    ((ConfigurableApplicationContext) applicationContext).close();
+                    System.exit(1);
                 })
                 .doOnComplete(() -> log.info("Import successful, the cache is now filled."));
     }
@@ -144,10 +139,5 @@ public class MoviesCacheManager implements ApplicationContextAware {
 
     boolean isCacheReady() {
         return isCacheReady;
-    }
-
-    @Override //hack as system.exit(1) doesn't work
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
     }
 }
