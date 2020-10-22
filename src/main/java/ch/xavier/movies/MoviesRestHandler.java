@@ -45,6 +45,11 @@ class MoviesRestHandler {
     public Mono<ServerResponse> getMovies(ServerRequest request) {
         List<String> movieIds = request.queryParams().get("id");
 
+        if (movieIds == null || movieIds.isEmpty()) {
+            log.error("Query parameters id missing for endpoint /movies, at least one is required");
+            throw new MovieNotFoundException();
+        }
+
         log.info("Getting movies ids:{}", movieIds);
 
         return ok()

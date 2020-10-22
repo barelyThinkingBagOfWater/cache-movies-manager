@@ -33,11 +33,10 @@ public class RedisConfiguration {
     @Bean
     public ReactiveRedisConnectionFactory factory() {
         if (clusterHosts.get(0).isEmpty()) {
-            log.debug("Connecting to a single Redis node with url:{}", singleHost);
-
+            log.info("Connecting to a single Redis node with url:{}", singleHost);
             return new LettuceConnectionFactory(singleHost, DEFAULT_PORT);
         } else {
-            log.debug("Connecting to a cluster of Redis nodes with urls:{}", clusterHosts);
+            log.info("Connecting to a cluster of Redis nodes with urls:{}", clusterHosts);
 
             RedisClusterConfiguration redisClusterConfiguration = new RedisClusterConfiguration();
             redisClusterConfiguration.setClusterNodes(
