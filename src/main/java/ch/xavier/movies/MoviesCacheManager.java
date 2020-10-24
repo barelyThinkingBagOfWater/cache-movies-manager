@@ -53,7 +53,9 @@ public class MoviesCacheManager {
         this.scheduler = Schedulers.fromExecutor(Executors.newFixedThreadPool(
                 Runtime.getRuntime().availableProcessors()));
 
-        fillCacheIfEmpty();
+        if (importers.size() > 0) {
+            fillCacheIfEmpty();
+        }
     }
 
 

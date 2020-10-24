@@ -21,8 +21,10 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @TestPropertySource(properties = {
-        "spring.redis.host=172.18.42.5",
-        "spring.rabbitmq.host=172.18.42.3"})
+        "spring.redis.host=172.18.42.2",
+        "spring.rabbitmq.host=172.18.42.3",
+        "importer.rest.uri="
+})
 @Slf4j
 public class ITestRedisMoviesRepository {
 
@@ -107,5 +109,23 @@ public class ITestRedisMoviesRepository {
                 // THEN2
                 .doOnNext(Assertions::assertNull)
                 .block();
+    }
+
+    @Test
+    public void add_tag_to_movie_work() {
+        // GIVEN
+        Movie preparedMovie = new Movie(1L, "title", "genres", Collections.emptySet());
+        redisMoviesRepository.save(preparedMovie)
+
+                // WHEN
+                .then(redisMoviesRepository.addTagToMovie("tag1", preparedMovie.getMovieId().toString()))
+
+                // THEN
+                .then(redisMoviesRepository.find(preparedMovie.getMovieId().toString()))
+                .doOnNext(Assertions::assertNotNull)
+                .doOnNext(movie -> assertEquals(movie.getTitle(), "title"))
+                .doOnNext(movie -> assertEquals(movie.getTags(), Set.of("tag1")))
+                .block();
+
     }
 }

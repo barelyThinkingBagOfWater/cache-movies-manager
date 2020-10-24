@@ -27,7 +27,7 @@ public class RedisMoviesRepository implements MoviesRepository {
 
     @Override
     public Mono<Boolean> save(Movie movie) {
-        return reactiveValueOps.setIfAbsent(movie.getMovieId().toString(), movie);
+        return reactiveValueOps.set(movie.getMovieId().toString(), movie);
     }
 
     @Override
