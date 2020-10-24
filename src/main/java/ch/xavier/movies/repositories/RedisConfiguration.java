@@ -14,34 +14,40 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Configuration
 @Slf4j
 public class RedisConfiguration {
 
-    @Value("#{'${spring.redis.cluster.hosts}'.split(',')}")
-    private List<String> clusterHosts;
+    @Value("${spring.redis.url}")
+    private String redisUrl;
 
-    @Value("${spring.redis.host}")
-    private String singleHost;
+    @Value("${spring.redis.nodesNumber}")
+    private Integer nodesNumber;
 
-    private static final int DEFAULT_PORT =  6379;
+    private static final int DEFAULT_PORT = 6379;
+    private static final String ID_TEMPLATE = "{id}";
 
 
     @Bean
     public ReactiveRedisConnectionFactory factory() {
-        if (clusterHosts.get(0).isEmpty()) {
-            log.info("Connecting to a single Redis node with url:{}", singleHost);
-            return new LettuceConnectionFactory(singleHost, DEFAULT_PORT);
+        if (nodesNumber == 1) {
+            log.info("Connecting to a single Redis node with url:{}", redisUrl);
+
+            return new LettuceConnectionFactory(redisUrl, DEFAULT_PORT);
         } else {
-            log.info("Connecting to a cluster of Redis nodes with urls:{}", clusterHosts);
+            log.info("Connecting to a cluster of Redis nodes with {} nodes and template url:{}", nodesNumber, redisUrl);
 
             RedisClusterConfiguration redisClusterConfiguration = new RedisClusterConfiguration();
-            redisClusterConfiguration.setClusterNodes(
-                    clusterHosts.stream().map(host -> new RedisNode(host, DEFAULT_PORT))
-                    .collect(Collectors.toList()));
+            List<RedisNode> redisNodes = new ArrayList<>();
+
+            for (int i = 0; i < nodesNumber; i++) {
+                redisNodes.add(new RedisNode(redisUrl.replace(ID_TEMPLATE, String.valueOf(i)), DEFAULT_PORT));
+            }
+
+            redisClusterConfiguration.setClusterNodes(redisNodes);
             return new LettuceConnectionFactory(redisClusterConfiguration);
         }
     }
