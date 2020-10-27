@@ -30,7 +30,7 @@ public class MoviesCacheManager {
     private final Long retryDelayInMs;
     private final Integer retryAttempts;
     private final Boolean logEachImport;
-    private final Integer timeout;
+    private final Integer repositoryTimeout;
     private boolean isCacheReady = false;
 
 
@@ -38,17 +38,17 @@ public class MoviesCacheManager {
     public MoviesCacheManager(MetricsService metricsService,
                               MoviesRepository repository,
                               List<EntitiesImporter<Movie>> importers,
-                              @Value("${manager.retryDelayInMs}") Long retryDelayInMs,
-                              @Value("${manager.retryAttempts}") Integer retryAttempts,
-                              @Value("${manager.logEachImport}") Boolean logEachImport,
-                              @Value("${manager.repositoryTimeoutInMs}") Integer timeout) {
+                              @Value("${manager.retry.delay.ms}") Long retryDelayInMs,
+                              @Value("${manager.retry.attempts}") Integer retryAttempts,
+                              @Value("${manager.imports.logging.enabled}") Boolean logEachImport,
+                              @Value("${manager.repository.timeout.ms}") Integer repositoryTimeout) {
         this.metricsService = metricsService;
         this.retryDelayInMs = retryDelayInMs;
         this.repository = repository;
         this.importers = importers;
         this.retryAttempts = retryAttempts;
         this.logEachImport = logEachImport;
-        this.timeout = timeout;
+        this.repositoryTimeout = repositoryTimeout;
 
         this.scheduler = Schedulers.fromExecutor(Executors.newFixedThreadPool(
                 Runtime.getRuntime().availableProcessors()));
@@ -117,7 +117,7 @@ public class MoviesCacheManager {
 
     private Mono<Boolean> addTagToMovie(String tagName, String movieId) {
         return repository.addTagToMovie(tagName, movieId)
-                .timeout(Duration.ofMillis(timeout))
+                .timeout(Duration.ofMillis(repositoryTimeout))
                 .retryWhen(Retry.backoff(retryAttempts, Duration.ofMillis(retryDelayInMs)))
                 .subscribeOn(scheduler)
                 .doOnError(e -> {
