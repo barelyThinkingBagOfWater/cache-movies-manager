@@ -2,7 +2,6 @@ package ch.xavier.movies.repositories;
 
 import ch.xavier.common.movies.Movie;
 import ch.xavier.movies.MoviesRepository;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ReactiveRedisOperations;
 import org.springframework.data.redis.core.ReactiveValueOperations;
@@ -13,7 +12,6 @@ import java.util.List;
 
 
 @Repository
-@Slf4j
 public class RedisMoviesRepository implements MoviesRepository {
 
     private final ReactiveRedisOperations<String, Movie> reactiveRedisOperations;

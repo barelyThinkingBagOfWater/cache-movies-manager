@@ -44,7 +44,7 @@ public class RedisConfiguration {
             log.info("Connecting to a cluster of Redis nodes with {} nodes and template url:{}", nodesNumber, redisSingleNodeUrl);
 
             RedisClusterConfiguration redisClusterConfiguration = new RedisClusterConfiguration();
-            List<RedisNode> redisNodes = new ArrayList<>();
+            List<RedisNode> redisNodes = new ArrayList<>(nodesNumber);
 
             Flux.range(0, nodesNumber).doOnNext(nodesNumber -> redisNodes.add(
                     new RedisNode(redisClusterUrl.replace(ID_TEMPLATE, String.valueOf(nodesNumber)), DEFAULT_PORT)))
