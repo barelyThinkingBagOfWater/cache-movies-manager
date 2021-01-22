@@ -14,7 +14,7 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 @Slf4j
 public class RestResource {
 
-    private static final String URL_PREFIX = "/cache-movies-manager";
+    private static final String URL_PREFIX = "/api/cache-movies-manager";
 
     @Bean
     public RouterFunction<ServerResponse> route(MoviesRestHandler handler) {
